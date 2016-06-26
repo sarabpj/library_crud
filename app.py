@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
-from models.shared import db
-from models.author import Author
-from models.book import Book
+from shared import db
+from models import Author
+from models import Book
 # Flask - class used to initialize an app
 # render_template - render a template
 # request - getting form data via POST request
@@ -13,8 +13,9 @@ from flask_modus import Modus
 app = Flask(__name__)
 modus = Modus(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/library_in_class'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/python_library'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.url_map.strict_slashes = False
 
 # Modus - allows us to do method override via headers or query string
 # with ?_method
@@ -27,57 +28,92 @@ with app.app_context():
 # from IPython import embed
 # embed()
    
-@app.route('/')
-def root():
-    return redirect(url_for('index'))
-
-# INDEX
-@app.route('/authors')
+@app.route('/', methods=["GET"])
 def index():
-    return render_template('index.html', authors = Author.query.all())
+    return render_template('index.html')
 
-# NEW
-@app.route('/authors/new')
-def new():
-    return render_template('new.html')
+# author routes
 
-# SHOW
-@app.route('/authors/<int:id>')
-def show(id):
-    return render_template('show.html', author = Author.query.get_or_404(id))
+@app.route('/authors', methods=["GET"])
+def index_author():
+    return render_template('authors/index.html', authors=Author.query.order_by(Author.id).all())
 
-# EDIT
-@app.route('/authors/<int:id>/edit')
-def edit(id):
-    return render_template('edit.html', author = Author.query.get_or_404(id))
-
-# CREATE
 @app.route('/authors', methods=["POST"])
-def create():
-    # create python obj
-    db.session.add(Book(request.form['title'],request.form['author']))
+def create_author():
+    db.session.add(Author(request.form['name']))
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index_author')) 
 
-# UPDATE
-@app.route('/authors/<int:id>', methods=["PATCH"])
-def update(id):
-    found_book = Book.query.get_or_404(id)
-    found_book.title = request.form['title']
-    found_book.author = request.form['author']
-    db.session.add(found_book)
+@app.route('/authors/new', methods=["GET"])
+def new_author():
+    return render_template('authors/new.html')
+
+@app.route('/authors/<id>/edit', methods=["GET"])
+def edit_author(id):
+    return render_template('authors/edit.html', author=Author.query.get_or_404(id))
+
+@app.route('/authors/<id>', methods=["GET"])
+def show_author(id):
+    return render_template('authors/show.html', author=Author.query.get_or_404(id))
+
+@app.route('/authors/<id>', methods=["PATCH"])
+def update_author(id):
+    author = Author.query.filter_by(id=id).first_or_404()
+    author.name = request.form['name']
+    db.session.add(author)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index_author'))
 
-# DELETE
-@app.route('/authors/<int:id>', methods=["DELETE"])
-def destroy(id):
-    found_book = Book.query.get_or_404(id)
-    db.session.delete(found_book)
+@app.route('/authors/<id>', methods=["DELETE"])
+def destroy_author(id):
+    db.session.delete(Author.query.get_or_404(id))
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index_author'))      
 
+# book routes
 
+@app.route('/authors/<id>/books', methods=["GET"])
+def index_book(id):
+    return render_template('books/index.html', author=Author.query.get_or_404(id))
+
+@app.route('/authors/<id>/books', methods=["POST"])
+def create_book(id):
+    book = Book(request.form['title'], id)
+
+    db.session.add(book)
+    db.session.commit()
+    return redirect(url_for('index_book', id=id)) 
+
+@app.route('/authors/<id>/books/new', methods=["GET"])
+def new_book(id):
+    return render_template('books/new.html', author=Author.query.get_or_404(id))
+
+@app.route('/authors/<id>/books/<book_id>/edit', methods=["GET"])
+def edit_book(id,book_id):
+    return render_template('books/edit.html', book=Book.query.get_or_404(book_id))
+
+@app.route('/authors/<id>/books/<book_id>', methods=["GET"])
+def show_book(id,book_id):
+    return render_template('books/show.html', book=Book.query.get_or_404(book_id))
+
+@app.route('/authors/<id>/books/<book_id>', methods=["PATCH"])
+def update_book(id,book_id):
+    book = Book.query.filter_by(id=book_id).first_or_404()
+    book.title = request.form['title']
+    db.session.add(book)
+    db.session.commit()
+    return redirect(url_for('index_book', id=id))
+
+@app.route('/authors/<id>/books/<book_id>', methods=["DELETE"])
+def destroy_book(id,book_id):
+    db.session.delete(Book.query.get_or_404(book_id))
+    db.session.commit()
+    return redirect(url_for('index_book', id=id))  
+   
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

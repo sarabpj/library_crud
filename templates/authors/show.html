@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+   <h1>Info on Author #{{ author.id }}</h1>
+  <ul>
+    <li>Name: {{ author.name }}</li>
+    <li>Books: Click <a href="{{ url_for('index_book', id=author.id) }}">here</a> to see</li>
+  </ul>
+  <a href="{{ url_for('edit_author', id=author.id) }}" class="btn btn-success navbar-btn">Edit</a>
+  <form action="{{ url_for('destroy_author', id=author.id) }}?_method=delete" class="del-form" method="post">  
+    <button class="btn btn-danger navbar-btn">Delete</button>
+  </form>
+
+
+{% endblock %}

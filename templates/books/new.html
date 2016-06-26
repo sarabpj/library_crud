@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+ 
+  <h1>Add a Book for {{ author.name }}!</h1>
+  <form action="{{ url_for('create_book', id=author.id) }}" method="post">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input type="text" class="form-control" id="title" placeholder="Book Title" name="title">
+    </div>
+    {% for tag in tags %}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="tags" value="{{ tag.id }}">
+          {{ tag.name }}
+        </label>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-default">Add This Book</button>
+    <a href="{{ url_for('index_book', id=author.id) }}" class="btn btn-warning">Never mind, go back</a>
+  </form>
+
+{% endblock %}

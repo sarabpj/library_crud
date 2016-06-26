@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Here are all the authors:</h1>
+    {% if authors %}
+        <table class="table table-bordered table-striped table-hover">
+            <tr>
+                <th>Name</th>
+                <th>Books</th>
+                <th>Actions</th>
+            </tr>
+            {% for author in authors %}
+            <tr>
+                <td>{{ author.name }}</td>
+                <td>Click <a href="{{ url_for('index_book', id=author.id) }}">here</a> to see</td>
+                <td>
+                    <a href="{{ url_for('show_author', id=author.id) }}" class="btn btn-primary navbar-btn">Show</a>
+                    <a href="{{ url_for('edit_author', id=author.id) }}" class="btn btn-success navbar-btn">Edit</a>
+                    <form action="{{ url_for('destroy_author', id=author.id) }}?_method=delete" class="del-form" method="post">  
+                        <button class="btn btn-danger navbar-btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Uh oh, looks like there aren't any authors yet...maybe you should add some?</p>
+    {% endif %} 
+{% endblock %}

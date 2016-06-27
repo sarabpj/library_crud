@@ -7,6 +7,14 @@
       <label for="title">Title</label>
       <input type="text" class="form-control" id="title" value="{{ book.title }}" placeholder="Book Title" name="title">
     </div>
+      {% for tag in tags %}
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" name="tags" value="{{ tag.id }}">
+          {{ tag.genre }}
+        </label>
+      </div>
+    {% endfor %}
     <button type="submit" class="btn btn-default">Edit This Book</button>
     <a href="{{ url_for('index_book', id=book.author_id) }}" class="btn btn-warning">Never mind, go back</a>
   </form>

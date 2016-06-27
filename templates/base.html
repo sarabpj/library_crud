@@ -10,9 +10,10 @@
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <div class="navbar-header">
-        <a class="navbar-brand" href="/">SICK LIBRARY BRO</a>
+        <a class="navbar-brand" href="/">LIBRARY APP</a>
       </div>
-      <div class="btn-group pull-right">  
+      <div class="btn-group pull-right">
+        <a href="{{ url_for('index_tag') }}" class="btn btn-default navbar-btn">See all Genres</a>  
         <a href="{{ url_for('index_author') }}" class="btn btn-default navbar-btn">See all authors</a>
         <a href="{{ url_for('new_author') }}" class="btn btn-default navbar-btn">Add an author</a>
       </div>

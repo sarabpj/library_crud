@@ -6,14 +6,15 @@ class Author(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
-    books = db.relationship('Book', backref='name', lazy='dynamic')
+    books = db.relationship('Book', backref='author', lazy='dynamic')
 
     def __init__(self, name):
         self.name = name
 
-    # This is what will be displayed when you examine an instance
     def __repr__(self):
-        return 'name {}'.format(self.name)
+        return 'id:{} name: {}'.format(self.id, self.name)
+
+
 
 class Book(db.Model):
 
@@ -22,14 +23,33 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text())
     author_id = db.Column(db.Integer, db.ForeignKey('authors.id'))
+    tags = db.relationship('Tag', secondary='book_tags', backref=db.backref('books', lazy='dynamic'))
 
     def __init__(self, title,author_id):
         self.title = title
         self.author_id = author_id
 
-    # This is what will be displayed when you examine an instance
+    # This is what will be displayed when you examine in the python console
     def __repr__(self):
         return 'id: {}, title: {}, author_id: {}'.format(self.id, self.title, self.author_id)
 
+class Tag(db.Model):
+    __tablename__ = 'tags'
 
-# from IPython import embed; embed()
+    id= db.Column(db.Integer, primary_key=True)
+    genre= db.Column(db.Text())
+
+    def __init__(self, genre):
+        self.genre = genre
+
+    def __repr__(self):
+        return 'id:{} genre: {}'.format(self.id, self.genre)
+
+
+book_tags = db.Table('book_tags',
+
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id')),
+    db.Column('book_id', db.Integer, db.ForeignKey('books.id'))
+
+)

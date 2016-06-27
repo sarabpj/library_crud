@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<h1>Add a Tag!</h1>
+  <form action="{{ url_for('create_tag') }}" method="post">
+    <div class="form-group">
+      <label for="genre">Genre</label>
+      <input type="text" class="form-control" id="genre" placeholder="Tag Genre" name="genre">
+    </div>
+    <button type="submit" class="btn btn-default">Add This Tag</button>
+    <a href="{{ url_for('index_tag') }}" class="btn btn-warning">Never mind, go back</a>
+  </form>
 
 {% endblock%}

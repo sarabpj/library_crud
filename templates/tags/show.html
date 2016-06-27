@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
+  <h1>Info on Tag #{{ tag.id }}</h1>
+  <h4>Name: {{ tag.genre }}</h4>
+  {% if tag.books.count() %}
+    <p>Number of books tagged with {{ tag.genre }}: {{ tag.books.count() }}</p>
+    <ol>
+      {% for book in tag.books %}
+        <li>{{ book.title }}, written by {{ book.author.name }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>Looks like no books have this tag. Maybe you should delete the tag or add some more books!</p>
+  {% endif %}
+  <a href="{{ url_for('edit_tag', tag_id=tag.id) }}" class="btn btn-success navbar-btn">Edit</a>
+  <form action="{{ url_for('destroy_tag', tag_id=tag.id) }}?_method=delete" class="del-form" method="post">  
+    <button class="btn btn-danger navbar-btn">Delete</button>
+  </form>
 {% endblock%}

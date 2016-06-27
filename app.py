@@ -90,7 +90,7 @@ def create_book(id):
 
 @app.route('/authors/<id>/books/new', methods=["GET"])
 def new_book(id):
-    return render_template('books/new.html', author=Author.query.get_or_404(id))
+    return render_template('books/new.html', author=Author.query.get_or_404(id), tags=Tag.query.all())
 
 @app.route('/authors/<id>/books/<book_id>/edit', methods=["GET"])
 def edit_book(id,book_id):
@@ -118,41 +118,40 @@ def destroy_book(id,book_id):
 #tag routes
 @app.route('/tags', methods=["GET"])
 def index_tag():
-    return render_template('tags/index.html')
+    return render_template('tags/index.html', tags=Tag.query.all())
 
 @app.route('/tags/new', methods=['GET'])
-def new_tag(id):
+def new_tag():
     return render_template('tags/new.html')
 
 @app.route('/tags', methods=["POST"])
-def create_tag(id):
-    tag = Tag(request.form['genre'], id)
-
+def create_tag():
+    tag = Tag(request.form['genre'])
     db.session.add(tag)
     db.session.commit()
-    return redirect(url_for('index_tag', id=id)) 
+    return redirect(url_for('index_tag')) 
 
 @app.route('/tags/<tag_id>', methods=['GET'])
-def show_tag(id):
-    return render_template('tags/show.html')   
+def show_tag(tag_id):
+    return render_template('tags/show.html',  tag=Tag.query.get_or_404(tag_id))   
 
 @app.route('/tags/<tag_id>/edit', methods=['GET'])
-def edit_tag(id):
-    return render_template('tags/edit.html')   
+def edit_tag(tag_id):
+    return render_template('tags/edit.html', tag=Tag.query.get_or_404(tag_id))   
 
 @app.route('/tags/<tag_id>', methods=["PATCH"])
-def update_tag(id):
-    tag = Tag.query.filter_by(id=id).first_or_404()
+def update_tag(tag_id):
+    tag = Tag.query.filter_by(id=tag_id).first_or_404()
     tag.genre = request.form['genre']
     db.session.add(tag)
     db.session.commit()
-    return redirect(url_for('index_tag', id=id))
+    return redirect(url_for('index_tag', id=tag_id))
 
 @app.route('/tags/<tag_id>', methods=["DELETE"])
-def destroy_tag(id):
-    db.session.delete(Tag.query.get_or_404(id))
+def destroy_tag(tag_id):
+    db.session.delete(Tag.query.get_or_404(tag_id))
     db.session.commit()
-    return redirect(url_for('index_tag', id=id))  
+    return redirect(url_for('index_tag', id=tag_id))  
 
 
 @app.errorhandler(404)

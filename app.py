@@ -94,7 +94,7 @@ def new_book(id):
 
 @app.route('/authors/<id>/books/<book_id>/edit', methods=["GET"])
 def edit_book(id,book_id):
-    return render_template('books/edit.html', book=Book.query.get_or_404(book_id))
+    return render_template('books/edit.html', book=Book.query.get_or_404(book_id), tags=Tag.query.all())
 
 @app.route('/authors/<id>/books/<book_id>', methods=["GET"])
 def show_book(id,book_id):
